@@ -1,4 +1,4 @@
-[![Express Logo](https://github.com/smehdibahrani/ChatBot-NodeJS/blob/main/img.png)](http://expressjs.com/)
+[(https://github.com/smehdibahrani/ChatBot-NodeJS/blob/main/img.png)]
 
   <!-- Fast, unopinionated, minimalist web framework for [node](http://nodejs.org). -->
 

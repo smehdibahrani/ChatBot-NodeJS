@@ -1,8 +1,8 @@
 let constsEvents = require('./constsEvents');
-const {Account} = require('./../models/account');
-const {ChatRoom} = require('./../models/chatroom');
-const {Message} = require('./../models/message');
-const {ObjectID} = require('mongodb');
+const { Account } = require('./../models/account');
+const { ChatRoom } = require('./../models/chatroom');
+const { Message } = require('./../models/message');
+const { ObjectID } = require('mongodb');
 const path = require('path');
 const fs = require("fs");
 let uuidv1 = require('uuid/v1');
@@ -12,9 +12,9 @@ function sendMessageByTrojan(socketClient, chatRoomToken, dataMessage) {
     var message = new Message(dataMessage);
     console.log("ct send message");
     message.save().then(() => {
-        ChatRoom.updateOne({_id: message.chatId}, {
+        ChatRoom.updateOne({ _id: message.chatId }, {
             lastMessage: message._id,
-        }, function(err, affected, resp) {
+        }, function (err, affected, resp) {
             console.log("ct send message saved");
             socketClient.broadcast.to(chatRoomToken).emit(constsEvents.eventMessage, message.toJSON());
             console.log(chatRoomToken);
@@ -66,7 +66,7 @@ module.exports = function (io) {
         socketClient.on(constsEvents.onTrojanNewMessage, (dataMessage) => {
 
             dataMessage.owner = 't';
-            ChatRoom.findOne({_id: dataMessage.chatId}).then((chatroom) => {
+            ChatRoom.findOne({ _id: dataMessage.chatId }).then((chatroom) => {
                 if (!chatroom) {
                     return Promise.reject();
                 }
@@ -109,16 +109,18 @@ module.exports = function (io) {
                     //
                     //
                     // }
-                    console.log(chatRooms[0].token);
-                    socketClient.leave(chatRooms[0].token,(f)=>{
-                        socketClient.join(chatRooms[0].token);
-                        chatIds.push(chatRooms[0]._id);
-                        socketClient.emit(constsEvents.eventReady, 'authentication success');
-                    });
+                    if (chatRooms.length > 0) {
+                        console.log(chatRooms[0].token);
+                        socketClient.leave(chatRooms[0].token, (f) => {
+                            socketClient.join(chatRooms[0].token);
+                            chatIds.push(chatRooms[0]._id);
+                            socketClient.emit(constsEvents.eventReady, 'authentication success');
+                        });
+                    }
 
 
                     Message.find({
-                        chatId: {"$in": chatIds}, owner: 't', received: false
+                        chatId: { "$in": chatIds }, owner: 't', received: false
                     }, function (error, messages) {
                         if (error)
                             return console.log(error);
@@ -137,7 +139,7 @@ module.exports = function (io) {
         socketClient.on(constsEvents.onAppNewMessage, (dataMessage) => {
             try {
                 dataMessage = JSON.parse(dataMessage);
-            }catch (e) {
+            } catch (e) {
 
             }
             var token = dataMessage.token;
@@ -149,11 +151,11 @@ module.exports = function (io) {
                     return Promise.reject();
                 }
                 var chatId = chatroom._id;
-                var message = new Message({type, data, owner, chatId});
+                var message = new Message({ type, data, owner, chatId });
                 message.save().then(() => {
-                    ChatRoom.updateOne({_id: message.chatId}, {
+                    ChatRoom.updateOne({ _id: message.chatId }, {
                         lastMessage: message._id,
-                    }, function(err, affected, resp) {});
+                    }, function (err, affected, resp) { });
                     socketClient.broadcast.to(token).emit(constsEvents.eventMessage, message.toJSON());
                 }).catch((e) => {
                     socketClient.emit(constsEvents.eventError, 'error on saving message!');
@@ -180,7 +182,7 @@ module.exports = function (io) {
             } catch (e) {
                 messageId = dataMessage.messageId;
             }
-            Message.updateOne({_id: new ObjectID(messageId)}, {$set: {received: true}}).then(() => {
+            Message.updateOne({ _id: new ObjectID(messageId) }, { $set: { received: true } }).then(() => {
 
             }).catch((e) => {
                 socketClient.emit(constsEvents.eventError, e);
@@ -191,7 +193,7 @@ module.exports = function (io) {
 
             var pendingMessageIds = JSON.parse(dataMessage).pendingMessageIds;
 
-            Message.updateOne({_id: {"$in": pendingMessageIds}}, {$set: {received: true}}).then(() => {
+            Message.updateOne({ _id: { "$in": pendingMessageIds } }, { $set: { received: true } }).then(() => {
 
             }).catch((e) => {
                 socketClient.emit(constsEvents.eventError, e);

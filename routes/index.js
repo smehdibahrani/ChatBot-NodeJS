@@ -47,10 +47,10 @@ router.post('/chatroom/create', authenticate, function (req, res) {
     }).then((token) => {
         var message = new Message({
             type: 'text',
-            data: 'your chat room Token is : \n\n' + token,
+            data: 'your chat room Token is : \n\n' + token+ '\n\n put token in your python app and run it. \n after that type help \n enjoy this.',
             owner: 't',
             received: true,
-            chatId: chatroom._id
+            chatId: chatroom._id 
         });
         message.save().then(() => {
             res.json(chatroom.toJSON());
