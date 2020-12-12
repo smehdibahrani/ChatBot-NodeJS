@@ -62,8 +62,8 @@ router.post('/chatroom/create', authenticate, function (req, res) {
 });
 
 router.get('/chatroom/list', authenticate, function (req, res) {
-
-    ChatRoom.find()
+    let accountId =req.account._id;
+    ChatRoom.find({accountId: new ObjectID(accountId)})
         .populate('lastMessage').exec(function (err, results) {
             res.json(results);
         });
