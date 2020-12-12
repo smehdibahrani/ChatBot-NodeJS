@@ -20,14 +20,15 @@ router.post('/login', function (req, res) {
     var account = new Account(body);
 
     Account.findByEmail(body.email).then((acct) => {
-        return acct.generateAuthToken().then((token) => {
+         acct.generateAuthToken().then((token) => {
             res.json(acct.toJSON());
         })
     }).catch((err) => {
-        account.save().then(() => {
-            return account.generateAuthToken();
-        }).then((token) => {
-            res.json({token});
+        account.save().then((acc) => {
+          
+             account.generateAuthToken();
+             console.log(account);
+             res.json(account.toJSON());
         }).catch((e) => {
             console.log(e);
             res.status(400).send(e)
