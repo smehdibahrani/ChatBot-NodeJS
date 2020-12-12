@@ -29,9 +29,9 @@ $ npm install
 $ npm start
 ```
 
-  View the website at: http://localhost:2001
+  Your server running at: http://localhost:2001
 
-)
+
 
 ## License
 
